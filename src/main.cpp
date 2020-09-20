@@ -2,6 +2,7 @@
 #include <DHT.h>
 
 #define DELAY_TIME 5000
+#define USE_DEGREE_CELSIUS false
 
 void rcvThermo(void);
 void dispSerialMonitor(float, float);
@@ -34,9 +35,8 @@ void loop() {
 }
 
 void rcvThermo(void){
-  const bool isFahrenheit = false;
   humi = dht.readHumidity();
-  temp = dht.readTemperature(isFahrenheit);
+  temp = dht.readTemperature(USE_DEGREE_CELSIUS);
 
   if (isnan(temp) || isnan(humi)) {
     Serial.println("ERROR");
