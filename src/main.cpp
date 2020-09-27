@@ -1,9 +1,9 @@
 #include <LiquidCrystal.h>
-#include <DHT.h>
 #include <SR04.h>
 
+#include "thermo.h"
+
 #define DELAY_TIME 5000
-#define USE_DEGREE_CELSIUS false
 
 #define BACKLIGHT_PIN 4
 #define TRIG_PIN 5
@@ -19,7 +19,6 @@ void judgeBackLight(void);
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 
 const int PIN_DHT = 2;
-DHT dht( PIN_DHT, DHT11 );
 bool backLightOnOff = true;
 SR04 sr04 = SR04(ECHO_PIN,TRIG_PIN);
 long dist;
@@ -36,27 +35,20 @@ void setup() {
 
   Serial.begin(9600);
   Serial.println("DHT11 start");
-  dht.begin();
+  initThermo(PIN_DHT);
 
   pinMode(BACKLIGHT_PIN, OUTPUT);
   digitalWrite(BACKLIGHT_PIN, HIGH);
 }
 
 void loop() {
-  rcvThermo();
+  receiveThermo();
+  temp = getTempreture();
+  humi = getHumidity();
   dispLCD();
   dispSerialMonitor(temp, humi);
   judgeBackLight();
   delay(DELAY_TIME);
-}
-
-void rcvThermo(void){
-  humi = dht.readHumidity();
-  temp = dht.readTemperature(USE_DEGREE_CELSIUS);
-
-  if (isnan(temp) || isnan(humi)) {
-    Serial.println("ERROR");
-  }
 }
 
 void dispLCD(void) {
