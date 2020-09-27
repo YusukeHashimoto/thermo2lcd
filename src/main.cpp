@@ -9,10 +9,12 @@
 #define TRIG_PIN 5
 #define ECHO_PIN 6
 
+#define POWER_SAVE_MODE
+
 void rcvThermo(void);
 void dispSerialMonitor(float, float);
 void dispLCD(void);
-void setBackLight(void);
+void judgeBackLight(void);
 
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 
@@ -44,7 +46,7 @@ void loop() {
   rcvThermo();
   dispLCD();
   dispSerialMonitor(temp, humi);
-  setBackLight();
+  judgeBackLight();
   delay(DELAY_TIME);
 }
 
@@ -75,7 +77,8 @@ void dispSerialMonitor(float temp, float humi){
   Serial.println(s);
 }
 
-void setBackLight(void){
+void judgeBackLight(void){
+#ifdef POWER_SAVE_MODE
   long a;
   a = sr04.Distance();
   if(abs(a - dist) > 3) {
@@ -84,11 +87,12 @@ void setBackLight(void){
     dist = a;
   } else {
     moveLessCount++;
-    if(moveLessCount > 12) {
+    if(moveLessCount > 12 && dist > 0) {
       backLightOnOff = false;
     }
   }
   Serial.println(dist);
 //  backLightOnOff = (a < 20) ? true : false;
   digitalWrite(BACKLIGHT_PIN, backLightOnOff);
+#endif  //POWER_SAVE_MODE
 }
